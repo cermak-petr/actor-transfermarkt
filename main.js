@@ -143,7 +143,7 @@ Apify.main(async () => {
     if(!input.crawlDepth){input.crawlDepth = 1;}
     if(!input.pageDepth){input.pageDepth = 99999999;}
     
-	await requestQueue.addRequest(new Apify.Request({
+    await requestQueue.addRequest(new Apify.Request({
     	url: input.startUrl,
     	uniqueKey: input.startUrl,
     	userData: {
@@ -152,7 +152,7 @@ Apify.main(async () => {
     	}
     }));
 	
-	const gotoFunction = async ({ page, request }) => {
+    const gotoFunction = async ({ page, request }) => {
     	await page.setRequestInterception(true)
     	page.on('request', intercepted => {
     	    const type = intercepted.resourceType();
@@ -223,13 +223,13 @@ Apify.main(async () => {
         handlePageFunction,
         handleFailedRequestFunction: async ({ request }) => {
             console.log(`Request ${request.url} failed 4 times`);
-		},
-		maxRequestRetries: 1,
-		maxConcurrency: input.parallels || 1,
-		pageOpsTimeoutMillis: 999999,
-		launchPuppeteerOptions: input.puppeteerOptions || {},
-		gotoFunction,
-		//launchPuppeteerOptions:{useChrome:true}
+	},
+	maxRequestRetries: 1,
+	maxConcurrency: input.parallels || 1,
+	pageOpsTimeoutMillis: 999999,
+	launchPuppeteerOptions: input.puppeteerOptions || {},
+	gotoFunction,
+	//launchPuppeteerOptions:{useChrome:true}
     });
 
 	console.log('running the crawler')
