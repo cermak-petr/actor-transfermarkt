@@ -141,7 +141,7 @@ Apify.main(async () => {
     const requestQueue = await Apify.openRequestQueue();
     if(!input.startUrl){throw new Error('Missinq "startUrl" attribute in INPUT!');}
     if(!input.crawlDepth){input.crawlDepth = 1;}
-    if(!input.pageDepth){input.pageDepth = 1;}
+    if(!input.pageDepth){input.pageDepth = 99999999;}
     
 	await requestQueue.addRequest(new Apify.Request({
     	url: input.startUrl,
