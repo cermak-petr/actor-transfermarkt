@@ -61,6 +61,17 @@ async function addRowId(row, record){
         record.url = url;
     }
 }
+	
+async function extractImageCell(cell){
+    const imgs = iCell.$$('img');
+    if(imgs.length == 0){return null;}
+    else if(imgs.length > 1){
+        const arr = [];
+	for(const img of imgs){arr.push(await getAttribute(img, 'alt'));}
+	return arr;
+    }
+    else{return await getAttribute(imgs[0], 'alt'));}
+}
 
 async function extractTable(page, selector, iColumns, iRowCells){
     let iGenerate = false;
@@ -79,6 +90,7 @@ async function extractTable(page, selector, iColumns, iRowCells){
             headers[i] = convertName(hText);
         }
     }
+	
     const rows = await page.$$(selector + ' > tbody > tr:not(.show-for-small-table-row)');
     for(const row of rows){
         const cells = await row.$$(':scope > td');
@@ -93,13 +105,18 @@ async function extractTable(page, selector, iColumns, iRowCells){
                 for(const iCell of iCells){
                     const content = await iCell.$(':scope > :first-child');
                     const iText = (await getText(content || iCell)).trim();
-                    if(iText.length > 0){recordArr.push(iText);}
+                    if(iText.length > 0 && iText !== '-'){recordArr.push(iText);}
+		    else{
+		        const img = await extractImageCell(iCell);
+			if(img){recordArr.push(img);}
+		    }
                 }
                 record[headers[iColumns[i]]] = recordArr;
             }
             else{
                 const rText = (await getText(cells[index])).split(/\s\s/);
-                record[headers[iColumns[i]]] = rText.length > 1 ? rText : rText[0];
+		const fText = rText.length > 1 ? rText : rText[0];
+                record[headers[iColumns[i]]] = fText !== '-' ? fText : await extractImageCell(cells[index]);
             }
         }
         result.push(record);
