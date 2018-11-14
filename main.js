@@ -67,7 +67,9 @@ async function extractImageCell(cell){
     if(imgs.length == 0){return null;}
     else if(imgs.length > 1){
         const arr = [];
-	for(const img of imgs){arr.push(await getAttribute(img, 'alt'));}
+	for(const img of imgs){
+	    arr.push(await getAttribute(img, 'alt'));
+	}
 	return arr;
     }
     else{return await getAttribute(imgs[0], 'alt');}
@@ -108,6 +110,7 @@ async function extractTable(page, selector, iColumns, iRowCells){
                     if(iText.length > 0 && iText !== '-'){recordArr.push(iText);}
 		    else{
 		        const img = await extractImageCell(content || iCell);
+			console.log('image cell: ' + img);
 			if(img){recordArr.push(img);}
 		    }
                 }
@@ -115,8 +118,12 @@ async function extractTable(page, selector, iColumns, iRowCells){
             }
             else{
                 const rText = (await getText(cells[index])).split(/\s\s/);
-		const fText = rText.length > 1 ? rText : rText[0];
-                record[headers[iColumns[i]]] = fText !== '-' ? fText : await extractImageCell(cells[index]);
+		const fText = rText.length > 1 ? rText : rText[0].trim();
+		if(fText === '' || fText === '-'){
+		    console.log('image cell: ' + (await extractImageCell(cells[index])));
+		    return await extractImageCell(cells[index]);
+		}
+                return fText;
             }
         }
         result.push(record);
