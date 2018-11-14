@@ -1,0 +1,38 @@
+{
+    "title": "Transfermarkt crawler input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Start URLs",
+            "type": "array",
+            "description": "URLs to start with.",
+            "prefill": [{ "url": "https://www.apify.com" }],
+            "editor": "requestListSources"
+        },
+        "proxyConfig": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Optionally use Apify Proxy.",
+            "default": {},
+            "editor": "proxy"
+        },
+        "crawlDepth": {
+            "title": "Maximum crawling depth",
+            "type": "integer",
+            "description": "How deep will the crawler follow links from the current page."
+        },
+        "pageDepth": {
+            "title": "Maximum pagination limit",
+            "type": "integer",
+            "description": "How far will the crawler follow pagination links."
+        },
+        "liveView": {
+            "title": "Enable LiveView",
+            "type": "boolean",
+            "description": "The crawler will have LiveView enabled.",
+            "default": false
+        }
+    },
+    "required": ["startUrls"]
+}
