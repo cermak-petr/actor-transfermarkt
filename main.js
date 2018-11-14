@@ -180,8 +180,7 @@ Apify.main(async () => {
     	    const type = intercepted.resourceType();
     	    if(type === 'image' || type === 'stylesheet'){intercepted.abort();}
     	    else{intercepted.continue();}
-    	})
-    	//console.log('going to: ' + request.url);
+    	});
     	await Apify.utils.puppeteer.hideWebDriver(page);
     	return await page.goto(request.url, {timeout: 200000});
     };
@@ -230,8 +229,11 @@ Apify.main(async () => {
 	    if(input.extractOnly && input.extractOnly.indexOf('player') < 0){return;}
             rObj.type = 'player';
             console.log('player page open: ' + request.url);
+            console.log('extracting player info...');
             const result = Object.assign(rObj, await extractHeader(page, '.auflistung', true));
-            result.transfers = await extractTable(page, '.transferhistorie table', [0, 1, 2, 4, 6, 7], [0, 1, 5, 9, 10, 11]);
+            console.log('extracting transfer info...');
+	    result.transfers = await extractTable(page, '.transferhistorie table', [0, 1, 2, 4, 6, 7], [0, 1, 5, 9, 10, 11]);
+            console.log('extracting carreer stats...');
             result.careerStats = await extractTable(page, '#yw1 table.items', [0, 2, 3, 4, 5], [1, 2, 3, 4, 5]);
             await Apify.pushData(result);
         }
