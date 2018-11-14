@@ -107,7 +107,7 @@ async function extractTable(page, selector, iColumns, iRowCells){
                     const iText = (await getText(content || iCell)).trim();
                     if(iText.length > 0 && iText !== '-'){recordArr.push(iText);}
 		    else{
-		        const img = await extractImageCell(iCell);
+		        const img = await extractImageCell(content || iCell);
 			if(img){recordArr.push(img);}
 		    }
                 }
