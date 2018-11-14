@@ -197,7 +197,7 @@ Apify.main(async () => {
         await page.waitForSelector('body', {timeout: 60000});
         
         if(input.crawlDepth > 1 && request.userData.crawlDepth < input.crawlDepth){
-            await enqueueLinks(page, requestQueue, request.userData, '#yw1 table.items > tbody a:not(.hide-for-small)', 0);
+            await enqueueLinks(page, requestQueue, request.userData, '#yw1 table.items > tbody :not(.hide-for-small) a:not(.hide-for-small)', 0);
         }
         if(input.pageDepth > 1 && request.userData.pageDepth < input.pageDepth){
             await enqueueLinks(page, requestQueue, request.userData, '.page a', 1);
