@@ -121,9 +121,9 @@ async function extractTable(page, selector, iColumns, iRowCells){
 		const fText = rText.length > 1 ? rText : rText[0].trim();
 		if(fText === '' || fText === '-'){
 		    console.log('image cell: ' + (await extractImageCell(cells[index])));
-		    return await extractImageCell(cells[index]);
+		    record[headers[iColumns[i]]] =  await extractImageCell(cells[index]);
 		}
-                return fText;
+                else{record[headers[iColumns[i]]] =  fText;}
             }
         }
         result.push(record);
