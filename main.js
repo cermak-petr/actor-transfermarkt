@@ -63,7 +63,7 @@ async function addRowId(row, record){
 }
 	
 async function extractImageCell(cell){
-    const imgs = iCell.$$('img');
+    const imgs = cell.$$('img');
     if(imgs.length == 0){return null;}
     else if(imgs.length > 1){
         const arr = [];
