@@ -203,6 +203,8 @@ Apify.main(async () => {
             await enqueueLinks(page, requestQueue, request.userData, '.page a', 1);
         }
         
+	if(input.extractLevels && input.extractLevels.indexOf(request.userData.crawlDepth) < 0){return;}
+	    
         const rObj = {};
         const pageId = extractId(request.url);
         if(pageId){rObj.id = pageId;}
