@@ -159,20 +159,27 @@ async function enqueueLinks(page, requestQueue, userData, selector, dType){
 Apify.main(async () => {
     const input = await Apify.getValue('INPUT');
     
-    console.log('opening request queue');
-    const requestQueue = await Apify.openRequestQueue();
-    if(!input.startUrl){throw new Error('Missinq "startUrl" attribute in INPUT!');}
+    if(!input.startUrls){throw new Error('Missinq "startUrls" attribute in INPUT!');}
     if(!input.crawlDepth){input.crawlDepth = 1;}
     if(!input.pageDepth){input.pageDepth = 99999999;}
     
-    await requestQueue.addRequest(new Apify.Request({
-    	url: input.startUrl,
-    	uniqueKey: input.startUrl,
-    	userData: {
-    	    pageDepth: 1,
-    	    crawlDepth: 1
-    	}
-    }));
+    // Check and fix startUrls
+    const startUrls = input.startUrls.map(url => {
+    	const req = url.url ? url : {url: url};
+    	req.userData = {pageDepth: 1, crawlDepth: 1};
+    	return req;
+    });
+	
+    // Create RequestList
+    const requestList = new Apify.RequestList({
+    	sources: startUrls,
+    	persistStateKey: 'startUrls'
+    });
+    await requestList.initialize();
+
+    // Create RequestQueue
+    console.log('opening request queue');
+    const requestQueue = await Apify.openRequestQueue();
 	
     const gotoFunction = async ({ page, request }) => {
     	await page.setRequestInterception(true)
@@ -252,6 +259,7 @@ Apify.main(async () => {
     if(input.liveView){launchPuppeteerOptions.liveView = true;}
 	
     const crawler = new Apify.PuppeteerCrawler({
+	requestList,
         requestQueue,
         handlePageFunction,
         handleFailedRequestFunction: async ({ request }) => {
