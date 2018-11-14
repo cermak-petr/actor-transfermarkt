@@ -75,7 +75,7 @@ async function extractImageCell(cell){
     else{return await getAttribute(imgs[0], 'alt');}
 }
 
-async function extractTableHeaders(page, iColumns){
+async function extractTableHeaders(page, selector, iColumns){
     let iGenerate = false;
     const headers = await page.$$(selector + ' > thead th');
     if(!iColumns){iColumns = []; iGenerate = true;}
@@ -96,7 +96,7 @@ async function extractTableHeaders(page, iColumns){
 
 async function extractTable(page, selector, iColumns, iRowCells){
     const result = [];
-    const headers = await extractTableHeaders(page, iColumns);
+    const headers = await extractTableHeaders(page, selector, iColumns);
     const rows = await page.$$(selector + ' > tbody > tr:not(.show-for-small-table-row)');
     for(const row of rows){
         const cells = await row.$$(':scope > td');
