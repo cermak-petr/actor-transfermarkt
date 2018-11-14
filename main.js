@@ -174,24 +174,37 @@ Apify.main(async () => {
         
         await page.waitForSelector('body', {timeout: 60000});
         
+        if(input.crawlDepth > 1 && request.userData.crawlDepth < input.crawlDepth){
+            await enqueueLinks(page, requestQueue, request.userData, '#yw1 table.items > tbody a', 0);
+        }
+        if(input.pageDepth > 1 && request.userData.pageDepth < input.pageDepth){
+            await enqueueLinks(page, requestQueue, request.userData, '.page a', 1);
+        }
+        
         const rObj = {};
         const pageId = extractId(request.url);
         if(pageId){rObj.id = pageId;}
         rObj.url = request.url;
         
         if(request.url.match(/\/wettbewerb\//)){
+	    rObj.type = 'competition';
+	    if(input.extractOnly && input.extractOnly.indexOf('competition') < 0){return;}
             console.log('competition page open: ' + request.url);
             const result = Object.assign(rObj, await extractHeader(page, '.profilheader', true));
             result.clubs = await extractTable(page, '#yw1 table.items', [1, 3, 4, 5, 6, 7]);
             await Apify.pushData(result);
         }
         else if(request.url.match(/\/verein\//)){
+            rObj.type = 'club';
+	    if(input.extractOnly && input.extractOnly.indexOf('club') < 0){return;}
             console.log('club page open: ' + request.url);
             const result = Object.assign(rObj, await extractHeader(page, '.dataDaten'));
             result.players = await extractTable(page, '#yw1 table.items', [0, 1, 3, 5]);
             await Apify.pushData(result);
         }
         else if(request.url.match(/\/spieler\//)){
+            rObj.type = 'player';
+	    if(input.extractOnly && input.extractOnly.indexOf('player') < 0){return;}
             console.log('player page open: ' + request.url);
             const result = Object.assign(rObj, await extractHeader(page, '.auflistung', true));
             result.transfers = await extractTable(page, '.transferhistorie table', [0, 1, 2, 4, 6, 7], [0, 1, 5, 9, 10, 11]);
@@ -209,25 +222,18 @@ Apify.main(async () => {
                 await Apify.pushData({url: request.url, error: 'Page type not supported.'});
             }
         }
-        
-        if(input.crawlDepth > 1 && request.userData.crawlDepth < input.crawlDepth){
-            await enqueueLinks(page, requestQueue, request.userData, '#yw1 table.items > tbody a', 0);
-        }
-        if(input.pageDepth > 1 && request.userData.pageDepth < input.pageDepth){
-            await enqueueLinks(page, requestQueue, request.userData, '.page a', 1);
-        }
     };
 
+    const launchPuppeteerOptions = input.proxyConfig || {};
+    if(input.liveView){launchPuppeteerOptions.liveView = true;}
+	
     const crawler = new Apify.PuppeteerCrawler({
         requestQueue,
         handlePageFunction,
         handleFailedRequestFunction: async ({ request }) => {
             console.log(`Request ${request.url} failed 4 times`);
 	},
-	maxRequestRetries: 1,
-	maxConcurrency: input.parallels || 1,
-	pageOpsTimeoutMillis: 999999,
-	launchPuppeteerOptions: input.puppeteerOptions || {},
+	launchPuppeteerOptions,
 	gotoFunction,
 	//launchPuppeteerOptions:{useChrome:true}
     });
