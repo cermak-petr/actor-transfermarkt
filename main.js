@@ -178,8 +178,8 @@ Apify.main(async () => {
     	await page.setRequestInterception(true)
     	page.on('request', intercepted => {
     	    const type = intercepted.resourceType();
-    		if(type === 'image' || type === 'stylesheet'){intercepted.abort();}
-    		else{intercepted.continue();}
+    	    if(type === 'image' || type === 'stylesheet'){intercepted.abort();}
+    	    else{intercepted.continue();}
     	})
     	//console.log('going to: ' + request.url);
     	await Apify.utils.puppeteer.hideWebDriver(page);
@@ -197,7 +197,7 @@ Apify.main(async () => {
         await page.waitForSelector('body', {timeout: 60000});
         
         if(input.crawlDepth > 1 && request.userData.crawlDepth < input.crawlDepth){
-            await enqueueLinks(page, requestQueue, request.userData, '#yw1 table.items > tbody a', 0);
+            await enqueueLinks(page, requestQueue, request.userData, '#yw1 table.items > tbody a:not(.hide-for-small)', 0);
         }
         if(input.pageDepth > 1 && request.userData.pageDepth < input.pageDepth){
             await enqueueLinks(page, requestQueue, request.userData, '.page a', 1);
@@ -209,40 +209,38 @@ Apify.main(async () => {
         rObj.url = request.url;
         
         if(request.url.match(/\/wettbewerb\//)){
-	    rObj.type = 'competition';
 	    if(input.extractOnly && input.extractOnly.indexOf('competition') < 0){return;}
+	    rObj.type = 'competition';
             console.log('competition page open: ' + request.url);
             const result = Object.assign(rObj, await extractHeader(page, '.profilheader', true));
             result.clubs = await extractTable(page, '#yw1 table.items', [1, 3, 4, 5, 6, 7]);
             await Apify.pushData(result);
         }
         else if(request.url.match(/\/verein\//)){
-            rObj.type = 'club';
 	    if(input.extractOnly && input.extractOnly.indexOf('club') < 0){return;}
+            rObj.type = 'club';
             console.log('club page open: ' + request.url);
             const result = Object.assign(rObj, await extractHeader(page, '.dataDaten'));
             result.players = await extractTable(page, '#yw1 table.items', [0, 1, 3, 5]);
             await Apify.pushData(result);
         }
         else if(request.url.match(/\/spieler\//)){
-            rObj.type = 'player';
 	    if(input.extractOnly && input.extractOnly.indexOf('player') < 0){return;}
+            rObj.type = 'player';
             console.log('player page open: ' + request.url);
             const result = Object.assign(rObj, await extractHeader(page, '.auflistung', true));
             result.transfers = await extractTable(page, '.transferhistorie table', [0, 1, 2, 4, 6, 7], [0, 1, 5, 9, 10, 11]);
             result.careerStats = await extractTable(page, '#yw1 table.items', [0, 2, 3, 4, 5], [1, 2, 3, 4, 5]);
             await Apify.pushData(result);
         }
+        else if(await page.$('#yw1 table.items')){
+            console.log('other page open: ' + request.url);
+            const result = Object.assign(rObj, {data: await extractTable(page, '#yw1 table.items')});
+            await Apify.pushData(result);
+        }
         else{
-            if(await page.$('#yw1 table.items')){
-                console.log('other page open: ' + request.url);
-                const result = Object.assign(rObj, {data: await extractTable(page, '#yw1 table.items')});
-                await Apify.pushData(result);
-            }
-            else{
-                console.log('unsupported page open: ' + request.url);
-                await Apify.pushData({url: request.url, error: 'Page type not supported.'});
-            }
+            console.log('unsupported page open: ' + request.url);
+            await Apify.pushData({url: request.url, error: 'Page type not supported.'});
         }
     };
 
@@ -256,10 +254,9 @@ Apify.main(async () => {
             console.log(`Request ${request.url} failed 4 times`);
 	},
 	launchPuppeteerOptions,
-	gotoFunction,
-	//launchPuppeteerOptions:{useChrome:true}
+	gotoFunction
     });
 
-	console.log('running the crawler')
+    console.log('running the crawler');
     await crawler.run();
 });
