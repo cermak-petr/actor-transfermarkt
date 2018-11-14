@@ -112,11 +112,6 @@ async function extractTable(page, selector, iColumns, iRowCells){
                     const content = await iCell.$(':scope > :first-child');
                     const iText = (await getText(content || iCell)).trim();
                     if(iText.length > 0 && iText !== '-'){recordArr.push(iText);}
-		    else{
-		        const img = await extractImageCell(content || iCell);
-			console.log('image cell: ' + img);
-			if(img){recordArr.push(img);}
-		    }
                 }
                 record[headers[iColumns[i]]] = recordArr;
             }
@@ -124,7 +119,6 @@ async function extractTable(page, selector, iColumns, iRowCells){
                 const rText = (await getText(cells[index])).split(/\s\s/);
 		const fText = rText.length > 1 ? rText : rText[0].trim();
 		if(fText === '' || fText === '-'){
-		    console.log('image cell: ' + (await extractImageCell(cells[index])));
 		    record[headers[iColumns[i]]] =  await extractImageCell(cells[index]);
 		}
                 else{record[headers[iColumns[i]]] =  fText;}
