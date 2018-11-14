@@ -70,7 +70,7 @@ async function extractImageCell(cell){
 	for(const img of imgs){arr.push(await getAttribute(img, 'alt'));}
 	return arr;
     }
-    else{return await getAttribute(imgs[0], 'alt'));}
+    else{return await getAttribute(imgs[0], 'alt');}
 }
 
 async function extractTable(page, selector, iColumns, iRowCells){
