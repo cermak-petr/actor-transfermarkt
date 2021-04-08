@@ -7,25 +7,28 @@
             "title": "Start URLs",
             "type": "array",
             "description": "URLs to start with.",
-            "prefill": [{ "url": "https://www.apify.com" }],
+            "prefill": [{ "url": "https://www.transfermarkt.com/lionel-messi/profil/spieler/28003" }],
             "editor": "requestListSources"
         },
         "proxyConfig": {
             "title": "Proxy configuration",
             "type": "object",
-            "description": "Optionally use Apify Proxy.",
-            "default": {},
+            "description": "Use Apify Proxy or your own to run this actor.",
+            "default": { "useApifyProxy": true },
+            "prefill": { "useApifyProxy": true },
             "editor": "proxy"
         },
         "crawlDepth": {
             "title": "Maximum crawling depth",
             "type": "integer",
-            "description": "How deep will the crawler follow links from the current page."
+            "description": "How deep will the crawler follow links from the current page.",
+            "prefill": 1
         },
         "pageDepth": {
             "title": "Maximum pagination limit",
             "type": "integer",
-            "description": "How far will the crawler follow pagination links."
+            "description": "How far will the crawler follow pagination links.",
+            "prefill": 1
         },
         "liveView": {
             "title": "Enable LiveView",
