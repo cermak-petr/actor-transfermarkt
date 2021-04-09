@@ -29,12 +29,6 @@
             "type": "integer",
             "description": "How far will the crawler follow pagination links.",
             "prefill": 1
-        },
-        "liveView": {
-            "title": "Enable LiveView",
-            "type": "boolean",
-            "description": "The crawler will have LiveView enabled.",
-            "default": false
         }
     },
     "required": ["startUrls"]

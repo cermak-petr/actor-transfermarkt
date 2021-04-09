@@ -1,0 +1,9 @@
+{
+    "extends": "@apify",
+    "parserOptions": {
+        "ecmaVersion": 2020
+    },
+    "rules": {
+        "max-len": 0
+    }
+}

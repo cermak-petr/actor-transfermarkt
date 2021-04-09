@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": false,
+        "alwaysStrict": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "noImplicitAny": true,
+        "checkJs": true,
+        "esModuleInterop": false,
+        "target": "es2020",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "es2020"
+        ]
+    }
+}
