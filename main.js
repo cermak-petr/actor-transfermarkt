@@ -44,8 +44,9 @@ async function extractHeader(page, selector, isTable, isPlayerInfo) {
 
         for (const [index, item] of keyRows.entries()) {
             const keyItem = convertName(await getText(item));
+            const formattedKeyItem = keyItem.slice(0, keyItem.length - 1);
             const valItem = (await getText(valRows[index])).split(/\s\s/);
-            result[keyItem.slice(0, keyItem.length - 1)] = valItem.length > 1 ? valItem : valItem[0];
+            result[formattedKeyItem] = valItem.length > 1 ? valItem : valItem[0];
         }
     } else {
         const rows = await page.$$(selector + (isTable ? ' tr' : ' p'));
@@ -54,8 +55,9 @@ async function extractHeader(page, selector, isTable, isPlayerInfo) {
             const cells = await row.$$(isTable ? 'th, td' : 'span');
             if (cells.length > 1) {
                 const name = convertName(await getText(cells[0]));
+                const formattedName = name.slice(0, name.length - 1);
                 const rText = (await getText(cells[1])).split(/\s\s/);
-                result[name.slice(0, name.length - 1)] = rText.length > 1 ? rText : rText[0];
+                result[formattedName] = rText.length > 1 ? rText : rText[0];
             }
         }
     }
