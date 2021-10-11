@@ -34,16 +34,31 @@ function extractId(url) {
  * @param {import("puppeteer").Page} page
  * @param {string} selector
  * @param {boolean} [isTable]
+ * @param {boolean} [isPlayerInfo]
  */
-async function extractHeader(page, selector, isTable) {
+async function extractHeader(page, selector, isTable, isPlayerInfo) {
     const result = {};
-    const rows = await page.$$(selector + (isTable ? ' tr' : ' p'));
-    for (const row of rows) {
-        const cells = await row.$$(isTable ? 'th, td' : 'span');
-        if (cells.length > 1) {
-            const name = convertName(await getText(cells[0]));
-            const rText = (await getText(cells[1])).split(/\s\s/);
-            result[name.slice(0, name.length - 1)] = rText.length > 1 ? rText : rText[0];
+    if (isPlayerInfo) {
+        const keyRows = await page.$$(`${selector}--regular`);
+        const valRows = await page.$$(`${selector}--bold`);
+
+        for (const [index, item] of keyRows.entries()) {
+            const keyItem = convertName(await getText(item));
+            const formattedKeyItem = keyItem.slice(0, keyItem.length - 1);
+            const valItem = (await getText(valRows[index])).split(/\s\s/);
+            result[formattedKeyItem] = valItem.length > 1 ? valItem : valItem[0];
+        }
+    } else {
+        const rows = await page.$$(selector + (isTable ? ' tr' : ' p'));
+        // const rows = await page.$$('.info-table--right-space');
+        for (const row of rows) {
+            const cells = await row.$$(isTable ? 'th, td' : 'span');
+            if (cells.length > 1) {
+                const name = convertName(await getText(cells[0]));
+                const formattedName = name.slice(0, name.length - 1);
+                const rText = (await getText(cells[1])).split(/\s\s/);
+                result[formattedName] = rText.length > 1 ? rText : rText[0];
+            }
         }
     }
     return result;
@@ -299,7 +314,7 @@ Apify.main(async () => {
                     page,
                     requestQueue,
                     request.userData,
-                    '#yw1 table.items > tbody :not(.hide-for-small) > a:not(.hide-for-small)',
+                    '#yw2 table.items > tbody :not(.hide-for-small) > a:not(.hide-for-small)',
                     0,
                 );
             }
@@ -365,7 +380,7 @@ Apify.main(async () => {
                     rObj,
                     await extractHeader(page, '.dataDaten'),
                 );
-                result.players = await extractTable(page, '#yw1 table.items', [
+                result.players = await extractTable(page, '#yw2 table.items', [
                     0,
                     1,
                     3,
@@ -384,7 +399,7 @@ Apify.main(async () => {
                 log.info('extracting player info...');
                 const result = Object.assign(
                     rObj,
-                    await extractHeader(page, '.auflistung', true),
+                    await extractHeader(page, '.info-table__content', false, true),
                 );
                 log.info('extracting transfer info...');
                 result.transfers = await extractTable(
@@ -396,15 +411,15 @@ Apify.main(async () => {
                 log.info('extracting carreer stats...');
                 result.careerStats = await extractTable(
                     page,
-                    '#yw1 table.items',
+                    '#yw2 table.items',
                     [0, 2, 3, 4, 5],
                     [1, 2, 3, 4, 5],
                 );
                 await Apify.pushData(result);
-            } else if (await page.$('#yw1 table.items')) {
+            } else if (await page.$('#yw3 table.items')) {
                 log.info(`other page open: ${request.url}`);
                 const result = Object.assign(rObj, {
-                    data: await extractTable(page, '#yw1 table.items'),
+                    data: await extractTable(page, '#yw3 table.items'),
                 });
                 await Apify.pushData(result);
             } else {
