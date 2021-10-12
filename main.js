@@ -380,7 +380,7 @@ Apify.main(async () => {
                     rObj,
                     await extractHeader(page, '.dataDaten'),
                 );
-                result.players = await extractTable(page, '#yw2 table.items', [
+                result.players = await extractTable(page, '#yw1 table.items', [
                     0,
                     1,
                     3,
