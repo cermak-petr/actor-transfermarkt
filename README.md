@@ -1,3 +1,4 @@
+## Features
 Using the **Transfermarkt scraper**, you can extract data from all transfermarkt.com pages and domains. It works best with *competition, club* or *player pages*, but supports other page types as well.
 
 Transfermarkt Scraper **requires only the start page URL**. The page type will be determined automatically, and the scraper will extract all the sports data accordingly. It is fairly simple to use as it only has 3 other input parameters to work with, other than the start page URL.
@@ -12,7 +13,7 @@ Transfermarkt Scraper **requires only the start page URL**. The page type will b
 
 ## Cost of usage
 
-Using our basic plan, the scraper's run will cost you around **2.5 USD credits** per 1000 scraped results. For more details about the plans we offer, platform credits and usage, see the [platform pricing page](https://apify.com/pricing/actors).
+Using our basic plan, the scraper's run will cost you around **2.5 USD credits per 1000 scraped results**. For more details about the plans we offer, platform credits and usage, see the [platform pricing page](https://apify.com/pricing/actors).
 
 If you're not sure how much credit you've got on your plan and whether you might need to upgrade, you can always check your limits in the *Settings* -> *Usage and Billing* tab in [your Console](https://console.apify.com/). The easiest way to know how many credits your actor will need is to perform a test run. 
 
