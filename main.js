@@ -191,6 +191,13 @@ async function extractTable(page, selector, iColumns, iRowCells) {
                 }
             }
         }
+        for (const recordItem of [record]) {
+            const href = await page.$eval(`a[title="${recordItem.player[0]}"]`, anchor => anchor.getAttribute('href'));
+            const routes = href.split('/');
+            const id = routes[routes.length - 1];
+            recordItem.url = `https://www.transfermarkt.com${href}`;
+            recordItem.id = id;
+        }
         result.push(record);
     }
     return result;
