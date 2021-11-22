@@ -142,7 +142,7 @@ async function extractTableHeaders(page, selector, iGenerate, iColumns) {
  * @param {number[]} [iColumns]
  * @param {number[]} [iRowCells]
  */
-async function extractTable(page, selector, iColumns, iRowCells) {
+async function extractTable(type, page, selector, iColumns, iRowCells) {
     const result = [];
     const iGenerate = !iColumns;
     if (iGenerate) {
@@ -191,6 +191,7 @@ async function extractTable(page, selector, iColumns, iRowCells) {
                 }
             }
         }
+        if (type === 'clubplayer') {
         for (const recordItem of [record]) {
             const href = await page.$eval(`a[title="${recordItem.player[0]}"]`, anchor => anchor.getAttribute('href'));
             const routes = href.split('/');
@@ -198,6 +199,7 @@ async function extractTable(page, selector, iColumns, iRowCells) {
             recordItem.url = `https://www.transfermarkt.com${href}`;
             recordItem.id = id;
         }
+    }
         result.push(record);
     }
     return result;
@@ -365,7 +367,7 @@ Apify.main(async () => {
                     rObj,
                     await extractHeader(page, '.profilheader', true),
                 );
-                result.clubs = await extractTable(page, '#yw1 table.items', [
+                result.clubs = await extractTable('club', page, '#yw1 table.items', [
                     1,
                     3,
                     4,
@@ -387,7 +389,7 @@ Apify.main(async () => {
                     rObj,
                     await extractHeader(page, '.dataDaten'),
                 );
-                result.players = await extractTable(page, '#yw1 table.items', [
+                result.players = await extractTable('clubplayer', page, '#yw1 table.items', [
                     0,
                     1,
                     3,
@@ -410,6 +412,7 @@ Apify.main(async () => {
                 );
                 log.info('extracting transfer info...');
                 result.transfers = await extractTable(
+                    'transfers',
                     page,
                     '.transferhistorie table',
                     [0, 1, 2, 4, 6, 7],
@@ -417,6 +420,7 @@ Apify.main(async () => {
                 );
                 log.info('extracting carreer stats...');
                 result.careerStats = await extractTable(
+                    'career',
                     page,
                     '#yw2 table.items',
                     [0, 2, 3, 4, 5],
@@ -426,7 +430,7 @@ Apify.main(async () => {
             } else if (await page.$('#yw3 table.items')) {
                 log.info(`other page open: ${request.url}`);
                 const result = Object.assign(rObj, {
-                    data: await extractTable(page, '#yw3 table.items'),
+                    data: await extractTable('result', page, '#yw3 table.items'),
                 });
                 await Apify.pushData(result);
             } else {
