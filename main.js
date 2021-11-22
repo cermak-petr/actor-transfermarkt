@@ -200,6 +200,16 @@ async function extractTable(type, page, selector, iColumns, iRowCells) {
                 recordItem.id = id;
             }
         }
+        if (type === 'clubcompetition') {
+            for (const recordItem of [record]) {
+                console.log(recordItem)
+                const href = await page.$eval(`a[title="${recordItem.name}"]`, anchor => anchor.getAttribute('href'));
+                const routes = href.split('/');
+                const id = routes[routes.length - 1];
+                recordItem.url = `https://www.transfermarkt.com${href}`;
+                recordItem.id = id;
+            }
+        }
         result.push(record);
     }
     return result;
@@ -367,7 +377,7 @@ Apify.main(async () => {
                     rObj,
                     await extractHeader(page, '.profilheader', true),
                 );
-                result.clubs = await extractTable('club', page, '#yw1 table.items', [
+                result.clubs = await extractTable('clubcompetition', page, '#yw1 table.items', [
                     1,
                     3,
                     4,
